@@ -1,0 +1,261 @@
+body {
+  font-family: sans-serif;
+  font-size: 1em;
+}
+
+h2, h3, h4, h5 {
+  font-family: sans-serif;
+  color: #a0a0a0;
+}
+
+h3 {
+  text-align: left;
+  font-weight: 400;
+  font-size: 2em;
+  margin: 0.25em;
+}
+
+
+p, li {
+  font-size: 1em;
+  text-align: left;
+  font-family: serif;
+  line-height: 1.2em;
+  color: #808080;
+}
+
+a {
+  text-decoration: none;
+  color: #5888e2;
+  cursor: default;
+}
+
+a:hover {
+  color: #ff8000;
+}
+
+div#content {
+  position: relative;
+  margin: auto;
+  width: 640px;
+}
+
+h3 {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+#stats {
+  position: relative;
+  height: 135px;
+  background-color: #F4F5F3;
+  margin-bottom: 7px;
+  margin-top: 30px;
+}
+
+#stats table {
+  position: absolute;
+  table-layout: fixed;
+  right: 15px;
+  top: 5px;
+  font-family: sans-serif;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+#stats th {
+  font-weight: 600;
+  color: darkgrey;
+}
+
+#stats .count-cell, .time-cell {
+  width: 80px;
+  text-align: right;
+}
+
+#stats td {
+  color: white;
+  vertical-align: middle;
+  padding: 2px;
+}
+
+#the-viz {
+  position: relative;
+  width: 640px;
+  height: 400px;
+}
+
+#the-controls {
+  position: relative;
+  height: 160px;
+  margin-top: 7px;
+  background-color: #F4F5F3;
+}
+
+button {
+  width: 50px;
+}
+
+#the-run-button {
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+#the-reset-button {
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 35px;
+  
+}
+
+#max-cars-input {
+  width: 50px;
+  position: absolute;
+  right: 10px;
+  top: 60px;
+}
+
+#max-cars-label {
+  position: absolute;
+  right: 70px;
+  top: 63px;
+}
+
+#the-controls .label {
+  display: block;
+  font-family: sans-serif;
+  font-weight: 500;
+  font-size: 0.85em;
+  color: darkgrey;
+  margin-bottom: 5px;
+}
+
+#the-controls .slider-output {
+  width: 30px;
+  position: absolute;
+  left: 170px;
+  top: 0px;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: darkgrey;
+}
+
+#launch-rate-slider-div {
+  display: block;
+  width: 210px;
+  position: absolute;
+  left: 10px;
+  top: 10px;    
+}
+
+#congestion-slider-div {
+  display: block;
+  width: 210px;
+  position: absolute;
+  left: 10px;
+  top: 60px;    
+}
+
+.slider {
+  width: 200px;
+  margin: 0px;  
+}
+
+
+#launch-menu-div {
+  display: block;
+  width: 100px;
+  position: absolute;
+  left: 10px;
+  top: 110px;  
+}
+
+#mode-menu-div {
+  display: block;
+  width: 150px;
+  position: absolute;
+  left: 300px;
+  top: 10px;  
+}
+
+#speed-menu-div {
+  display: block;
+  width: 150px;
+  position: absolute;
+  left: 300px;
+  top: 60px;  
+}
+
+#selection-method-menu-div {
+  display: block;
+  width: 150px;
+  position: absolute;
+  left: 300px;
+  top: 110px;  
+}
+
+select {
+  display: block;
+  width: 150px;
+}
+
+
+#geek-out {
+  font-family: sans-serif;
+  font-size: 8px;
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+}
+
+path.thin-road {
+  stroke-width: 4px;
+  stroke: #f5f5f5;
+  fill: none;
+}
+
+path.wide-road {
+  stroke-width: 9px;
+  stroke: #f5f5f5;
+  stroke-linecap: round;
+  fill: none;
+}
+
+path#river {
+  stroke: #73acd0;
+  stroke-width: 25px;
+  fill: none;
+}
+
+circle.junction {
+  fill: #f5f5f5;
+  stroke-width: 1px;
+  stroke: #aaaaaa;
+}
+
+path#sn-bridge.closed,
+path#ns-bridge.closed {
+  stroke-opacity: 0.2;
+}
+
+path#barricade {
+  stroke-width: 3px;
+  stroke: red;
+  fill: none;
+  stroke-linecap: round;
+}
+
+path#barricade.hidden {
+  display: none;
+}
+
+text {  
+  font-family: sans-serif;
+  fill: #575757;
+}
+
