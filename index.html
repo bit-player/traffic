@@ -88,7 +88,7 @@
           <output id="congestion-output" for="congestion-slider" class="slider-output">0.55</output>
         </div>
         
-        <div id="launch-menu-div">
+        <div id="launch-menu-div" class="geeky hidden-control">
           <label for="launch-timing-menu" class="label">Launch Timing</label>
           <select id="launch-timing-menu">
             <option value="poisson">random poisson</option>
@@ -105,7 +105,7 @@
           </select>
         </div>
         
-        <div id="speed-menu-div">
+        <div id="speed-menu-div" class="geeky hidden-control">
           <label for="speed-menu" class="label">Speed Measurement</label>
           <select id="speed-menu">
             <option value="theoretical">theoretical</option>
@@ -114,7 +114,7 @@
           </select>
         </div>
         
-        <div id="selection-method-menu-div">
+        <div id="selection-method-menu-div" class="geeky hidden-control">
           <label for="selection-method-menu" class="label">Route Selection Method</label>
           <select id="selection-method-menu">
             <option value="minimum">always choose fastest</option>
@@ -123,8 +123,9 @@
         </div>
         
         <button id="the-reset-button">Reset</button>
-        <label id="max-cars-label" for="max-cars-input" class="label">Max Cars</label>
-        <input id="max-cars-input" type="number" min="0" max="10000" step="100">
+        <label id="max-cars-label" for="max-cars-input" class="label geeky hidden-control">Max Cars</label>
+        <input id="max-cars-input"  class="geeky hidden-control" type="number" min="0" max="10000" step="100">
+        <a href="#" id="geek-out">Geek out!</a>
       </div>
 
       <div id="caption">

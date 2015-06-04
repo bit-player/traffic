@@ -51,6 +51,9 @@
   var selectionMethodMenu = document.getElementById("selection-method-menu");
   selectionMethodMenu.addEventListener("change", getSelectionMethod, false);
   
+  var geekAnchor = document.getElementById("geek-out");
+  geekAnchor.addEventListener("click", toggleGeekMode, false);
+  
   
   
     // globals
@@ -74,6 +77,8 @@
   var launchRate = 0.55;  // rate at which cars attempt to enter the network at Origin; exact meaning depends on launchTiming
   var congestionCoef = 0.55;  // 0 means no congestion slowing at all; 1 means max density, traffic slows almost to a stop
   var quickestTrip = 582 / speedLimit;    // Minimum number of time steps to traverse shortest route with zero congestion
+  var geekMode = false;     // whether to show extra geeky controls; initially no
+  var hintMode = true;      // whether to show tooltips; intially yes
 
   
   
@@ -200,64 +205,50 @@
   
   
 
-  // Now we move on to the links, the roadways. 
-
+  // Now we move on to the links, the roadways of the model. Again there's a
+  // visible manifestation as an SVG element and a behind-the-scenes data
+  // structure, which takes the form a queue. (See queue.js for details on
+  // the latter.)
+  // Note that much of the basic data about the link comes from the SVG
+  // (which is defined in index.html): the length of the path, start and end
+  // coordinates, which class of road it is (congestible or not).
   
-    // constructor for links
+    // constructor for links; oNode and dNode are the origin and destination nodes
   var Link = function(idStr, oNode, dNode) {
     this.id = idStr;
     this.svgPath = document.getElementById(idStr);
-    this.pathLength = Math.round(this.svgPath.getTotalLength());
+    this.pathLength = Math.round(this.svgPath.getTotalLength());  // rounding to ensure lengths A=B and a=b
     this.originXY = this.svgPath.getPointAtLength(0);
     this.destinationXY = this.svgPath.getPointAtLength(this.pathLength);
     this.originNode = oNode;
     this.destinationNode = dNode;
-    this.openToTraffic = true;
-    this.carQ = new Queue(carQueueSize);
-    this.congestible = this.svgPath.classList.contains("thin-road");
+    this.openToTraffic = true;                  // always true except for bridge links
+    this.carQ = new Queue(carQueueSize);        // vehicles currently driving on this link
+    this.congestible = this.svgPath.classList.contains("thin-road");    // true for a and b only
     this.occupancy = this.carQ.len;
     this.speed = speedLimit;
-    this.travelTime = this.pathLength / speedLimit;
+    this.travelTime = this.pathLength / speedLimit;   // default value, will be overridden
   }
   
-  Link.prototype.updateSpeed = function() {
+  Link.prototype.updateSpeed = function() {      // default, works for wide roads; will override for a and b
     this.speed = speedLimit;
     this.travelTime = this.pathLength / this.speed;
   }
-  
-//  Link.prototype.drive = function() {
-//    var i, car, leadCar, leader, follower, carXY, oldProgress;
-//    if (this.carQ.len > 0) {
-//      leadCar = this.carQ.first();
-//      oldProgress = leadCar.progress;
-//      leadCar.progress = Math.min(this.pathLength, leadCar.progress + this.speed);
-//      leadCar.odometer += leadCar.progress - oldProgress;
-//      for (i = 1; i < this.carQ.len; i++) {
-//        leader = this.carQ.peek(i - 1);
-//        follower = this.carQ.peek(i);
-//        oldProgress = follower.progress;
-//        follower.progress = Math.min(follower.progress + this.speed, leader.progress - carLength);
-//        follower.odometer += follower.progress - oldProgress;
-//      }
-//      for (i = 0; i < this.carQ.len; i++) {
-//        car = this.carQ.peek(i);
-//        carXY = this.svgPath.getPointAtLength(car.progress);
-//        car.avatar.setAttribute("cx", carXY.x);
-//        car.avatar.setAttribute("cy", carXY.y);
-//      }
-//      if (leadCar.progress >= this.pathLength && this.destinationNode.hasRoom()) {
-//        this.destinationNode.accept(this.carQ.dequeue());
-//        this.updateSpeed();
-//      }
-//    }
-//  }
-  
-  Link.prototype.getCarXY = function(progress) {
+    
+  Link.prototype.getCarXY = function(progress) {     // 0 <= progress <= path.length
     return this.svgPath.getPointAtLength(progress);
   }
   
+    // This is where the rubber meets the road, the procedure that actually
+    // moves the cars along a link. It's also where most of the CPU cycles
+    // get spent.
+    // The basic idea is to take a car's current speed, determine how far it
+    // will move along the path at that speed in one time step, and update
+    // its xy coordinates. But there's a complication: The car may not be able
+    // to move that far if there's another car in front of it, or if it's near
+    // the end of the path. 
   Link.prototype.drive = function() {
-    var i, car, firstCar, leader, follower, carXY, oldProgress;
+    var i, car, firstCar, leader, follower, carXY;
     if (this.carQ.len > 0) {
       firstCar = this.carQ.peek(0);
       firstCar.pastProgress = firstCar.progress;
@@ -741,6 +732,24 @@
     var selectedMode = selectionMethodMenu.value;
     selectionMethod = selectedMode;
 //    routingFunction = modes[selectedMode];
+  }
+  
+  function toggleGeekMode(e) {
+    var geekyControls = document.querySelectorAll(".geeky");
+    console.log(geekyControls);
+    if (geekMode) {
+      for (var i=0; i<geekyControls.length; i++) {
+//        geekyControls[i].classList.add("hidden-control");
+        geekyControls[i].style.display="none";
+      }
+    }
+    else {
+      for (var i=0; i<geekyControls.length; i++) {
+//        geekyControls[i].classList.remove("hidden-control");
+        geekyControls[i].style.display="block";
+      }
+    }
+    geekMode = !geekMode;
   }
   
   

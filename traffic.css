@@ -168,8 +168,7 @@ button {
 
 
 #launch-menu-div {
-  display: block;
-  width: 100px;
+  width: 150px;
   position: absolute;
   left: 10px;
   top: 110px;  
@@ -184,7 +183,6 @@ button {
 }
 
 #speed-menu-div {
-  display: block;
   width: 150px;
   position: absolute;
   left: 300px;
@@ -192,7 +190,6 @@ button {
 }
 
 #selection-method-menu-div {
-  display: block;
   width: 150px;
   position: absolute;
   left: 300px;
@@ -211,6 +208,10 @@ select {
   position: absolute;
   bottom: 3px;
   right: 5px;
+}
+
+.hidden-control {
+  display: none;
 }
 
 path.thin-road {
