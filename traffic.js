@@ -199,82 +199,8 @@
   }
   
   
-  
-  
-  
-  var chooser = {};
-    
-  chooser.random = function(routeList) {
-    return routeList[Math.floor(Math.random() * routeList.length)];
-  }
-  
-  chooser.min = function(routeList) {
-    var minVal = Infinity;
-    var minRoutes = [];
-    for (var i = 0; i < routeList.length; i++) {
-      if (routeList[i].travelTime < minVal) {
-        minVal = routeList[i].travelTime;
-        minRoutes = [routeList[i]];
-      }
-      else if (routeList[i].travelTime === minVal) {
-        minRoutes.push(routeList[i]);
-      }
-    }
-    if (minRoutes.length === 1) {
-      return minRoutes[0];
-    }
-    else {
-      return minRoutes[Math.floor(Math.random() * minRoutes.length)];
-    }
-  }
-    
-  chooser.probabilistic = function(routeList) {
-    var valSum = 0;
-    for (var i = 0; i < routeList.length; i++) {
-      routeList[i].travelTime = 1 / routeList[i].travelTime;
-      valSum += routeList[i].travelTime;
-    }
-    routeList.forEach(function(rt) {rt.travelTime /= valSum});
-    var r = Math.random();
-    var accum = 0;
-    for (var i = 0; i < routeList.length; i++) {
-      accum += routeList[i].travelTime;
-      if (r <= accum) {
-          return routeList[i];
-      }
-    }
-  }
 
-      
-  
-  function chooseRoute() {
-    var availableRoutes;
-    if (bridgeBlocked) {
-      availableRoutes = [Ab, aB];
-    }
-    else {
-      availableRoutes = [Ab, aB, AB, ab];
-    }
-    if (routingMode === "random") {
-      return chooser.random(availableRoutes);
-    }
-    else {                                          // routingMode === "selfish"
-      availableRoutes.forEach(function(route) {
-        route.calcTravelTime();
-      });
-      if (selectionMethod === "minimum") {
-        return chooser.min(availableRoutes);
-      }
-      else {                                        // selectionMethod === "probabilistic"
-        return chooser.probabilistic(availableRoutes);
-      }
-    }
-  }
-  
-  
-
-
-  
+  // Now we move on to the links, the roadways. 
 
   
     // constructor for links
@@ -511,6 +437,86 @@
   ab.itinerary = [aLink, snLink, bLink];
   ab.calcRouteLength();
     
+  
+  
+    
+  
+  
+  var chooser = {};
+    
+  chooser.random = function(routeList) {
+    return routeList[Math.floor(Math.random() * routeList.length)];
+  }
+  
+  chooser.min = function(routeList) {
+    var minVal = Infinity;
+    var minRoutes = [];
+    for (var i = 0; i < routeList.length; i++) {
+      if (routeList[i].travelTime < minVal) {
+        minVal = routeList[i].travelTime;
+        minRoutes = [routeList[i]];
+      }
+      else if (routeList[i].travelTime === minVal) {
+        minRoutes.push(routeList[i]);
+      }
+    }
+    if (minRoutes.length === 1) {
+      return minRoutes[0];
+    }
+    else {
+      return minRoutes[Math.floor(Math.random() * minRoutes.length)];
+    }
+  }
+    
+  chooser.probabilistic = function(routeList) {
+    var valSum = 0;
+    for (var i = 0; i < routeList.length; i++) {
+      routeList[i].travelTime = 1 / routeList[i].travelTime;
+      valSum += routeList[i].travelTime;
+    }
+    routeList.forEach(function(rt) {rt.travelTime /= valSum});
+    var r = Math.random();
+    var accum = 0;
+    for (var i = 0; i < routeList.length; i++) {
+      accum += routeList[i].travelTime;
+      if (r <= accum) {
+          return routeList[i];
+      }
+    }
+  }
+
+      
+  
+  function chooseRoute() {
+    var availableRoutes;
+    if (bridgeBlocked) {
+      availableRoutes = [Ab, aB];
+    }
+    else {
+      availableRoutes = [Ab, aB, AB, ab];
+    }
+    if (routingMode === "random") {
+      return chooser.random(availableRoutes);
+    }
+    else {                                          // routingMode === "selfish"
+      availableRoutes.forEach(function(route) {
+        route.calcTravelTime();
+      });
+      if (selectionMethod === "minimum") {
+        return chooser.min(availableRoutes);
+      }
+      else {                                        // selectionMethod === "probabilistic"
+        return chooser.probabilistic(availableRoutes);
+      }
+    }
+  }
+  
+  
+
+
+  
+  
+  
   
   // constructor for cars
   var Car = function() {
