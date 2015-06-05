@@ -59,10 +59,10 @@ div#explanation {
 
 #stats {
   position: relative;
-  height: 135px;
+  height: 140px;
   background-color: #F4F5F3;
   margin-bottom: 7px;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 
 #stats table {
