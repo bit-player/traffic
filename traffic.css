@@ -133,13 +133,6 @@ button {
   width: 50px;
 }
 
-/*
-#max-cars-label {
-  position: absolute;
-  right: 70px;
-  top: 63px;
-}
-*/
 
 #the-controls .label {
   display: block;
@@ -192,21 +185,21 @@ button {
 
 #mode-menu-div {
   display: block;
-  width: 150px;
+  width: 160px;
   position: absolute;
   left: 300px;
   top: 10px;  
 }
 
 #speed-menu-div {
-  width: 150px;
+  width: 160px;
   position: absolute;
   left: 300px;
   top: 60px;  
 }
 
 #selection-method-menu-div {
-  width: 150px;
+  width: 160px;
   position: absolute;
   left: 300px;
   top: 110px;  
