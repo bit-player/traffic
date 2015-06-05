@@ -561,7 +561,15 @@
     launchRateSlider.value = launchRate;
     routingModeMenu.value = routingMode;
     launchTimingMenu.value = launchTiming;
+    speedMenu.value = speedMode;
+    selectionMethodMenu.value = selectionMethod;
     maxCarsInput.value = "";
+    var geekyControls = document.querySelectorAll(".geeky");
+    for (var i=0; i<geekyControls.length; i++) {
+      geekyControls[i].style.display = "none";
+    }
+    geekToggle.textContent = "More controls"
+    geekMode = false;
   }
   
   
@@ -741,19 +749,18 @@
   
   function toggleGeekMode(e) {
     var geekyControls = document.querySelectorAll(".geeky");
-    console.log(geekyControls);
     if (geekMode) {
       for (var i=0; i<geekyControls.length; i++) {
         geekyControls[i].style.display = "none";
-        geekToggle.textContent = "More controls"
       }
+      geekToggle.textContent = "More controls"
     }
     else {
       for (var i=0; i<geekyControls.length; i++) {
         geekyControls[i].style.display="block";
-        geekToggle.textContent = "Fewer controls"
       }
-    }
+      geekToggle.textContent = "Fewer controls"
+   }
     geekMode = !geekMode;
   }
   

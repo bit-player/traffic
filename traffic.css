@@ -42,8 +42,19 @@ div#content {
 
 h3 {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 0px;
+  left: 10px;
+}
+
+div#explanation {
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  width: 360px;
+  font-family: sans-serif;
+  color: #a0a0a0;
+  font-size: 0.7em;
+  
 }
 
 #stats {
@@ -112,18 +123,23 @@ button {
   
 }
 
-#max-cars-input {
-  width: 50px;
+#max-cars-div {
   position: absolute;
   right: 10px;
-  top: 60px;
+  top: 70px;  
 }
 
+#max-cars-input {
+  width: 50px;
+}
+
+/*
 #max-cars-label {
   position: absolute;
   right: 70px;
   top: 63px;
 }
+*/
 
 #the-controls .label {
   display: block;
