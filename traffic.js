@@ -51,8 +51,13 @@
   var selectionMethodMenu = document.getElementById("selection-method-menu");
   selectionMethodMenu.addEventListener("change", getSelectionMethod, false);
   
-  var geekAnchor = document.getElementById("geek-out");
-  geekAnchor.addEventListener("click", toggleGeekMode, false);
+  var geekToggle = document.getElementById("geek-out");
+  geekToggle.addEventListener("click", toggleGeekMode, false);
+  
+  var hintToggle = document.getElementById("hint-toggle");
+  hintToggle.addEventListener("click", toggleHints, false);
+  
+  var hintStylesheet = document.getElementById("hint-stylesheet");
   
   
   
@@ -739,17 +744,29 @@
     console.log(geekyControls);
     if (geekMode) {
       for (var i=0; i<geekyControls.length; i++) {
-//        geekyControls[i].classList.add("hidden-control");
-        geekyControls[i].style.display="none";
+        geekyControls[i].style.display = "none";
+        geekToggle.textContent = "More controls"
       }
     }
     else {
       for (var i=0; i<geekyControls.length; i++) {
-//        geekyControls[i].classList.remove("hidden-control");
         geekyControls[i].style.display="block";
+        geekToggle.textContent = "Fewer controls"
       }
     }
     geekMode = !geekMode;
+  }
+  
+  function toggleHints(e) {
+    if (hintMode) {
+      hintStylesheet.disabled = true;
+      hintToggle.textContent = "Show hover hints"
+    }
+    else {
+      hintStylesheet.disabled = false;
+      hintToggle.textContent = "Hide hover hints"
+    }
+    hintMode = !hintMode;
   }
   
   

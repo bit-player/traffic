@@ -3,7 +3,7 @@
 * Copyright (c) 2015 Kushagra Gour; Licensed MIT */
 
 /*-------------------------------------*\
-	HINT.css - A CSS tooltip library
+  HINT.css - A CSS tooltip library
 \*-------------------------------------*/
 /**
  * HINT.css is a tooltip library made in pure CSS.
@@ -19,11 +19,11 @@
  *
  * Defines the basic styling for the tooltip.
  * Each tooltip is made of 2 parts:
- * 	1) body (:after)
- * 	2) arrow (:before)
+ *   1) body (:after)
+ *   2) arrow (:before)
  *
  * Classes added:
- * 	1) hint
+ *   1) hint
  */
 .hint, [data-hint] {
   position: relative;
@@ -78,10 +78,10 @@
  * Defines the positoning logic for the tooltips.
  *
  * Classes added:
- * 	1) hint--top
- * 	2) hint--bottom
- * 	3) hint--left
- * 	4) hint--right
+ *   1) hint--top
+ *   2) hint--bottom
+ *   3) hint--left
+ *   4) hint--right
  */
 /**
  * set default color for tooltip arrows
@@ -180,10 +180,10 @@
  * Contains tooltips of various types based on color differences.
  *
  * Classes added:
- * 	1) hint--error
- * 	2) hint--warning
- * 	3) hint--info
- * 	4) hint--success
+ *   1) hint--error
+ *   2) hint--warning
+ *   3) hint--info
+ *   4) hint--success
  *
  */
 /**
@@ -252,7 +252,7 @@
  * Defines a persisted tooltip which shows always.
  *
  * Classes added:
- * 	1) hint--always
+ *   1) hint--always
  *
  */
 .hint--always:after, .hint--always:before {
@@ -281,7 +281,7 @@
  * Defines rounded corner tooltips.
  *
  * Classes added:
- * 	1) hint--rounded
+ *   1) hint--rounded
  *
  */
 .hint--rounded:after {
@@ -293,8 +293,8 @@
  * Defines various transition effects for the tooltips.
  *
  * Classes added:
- * 	1) hint--no-animate
- * 	2) hint--bounce
+ *   1) hint--no-animate
+ *   2) hint--bounce
  *
  */
 .hint--no-animate:before, .hint--no-animate:after {
