@@ -18,6 +18,7 @@
       
       <div id="stats">
         <h3>Playing in traffic</h3>
+        <div id="explanation">Roads <em>A</em> and <em>B</em> take a roundabout route but can carry unlimited traffic. Roads <em>a</em> and <em>b</em> are shorter but subject to congestion: The more cars, the slower they go. Initially, just two routes lead from Origin to Destination: <em>Ab</em> and <em>aB</em>. Clicking on the bridge in the middle of the map opens up two more pathways: <em>AB</em> and <em>ab</em>. Will these added routes improve the flow of traffic? For more information see <a href="http://bit-player.org">bit-player.org</a>.</div>
         <table id=stats-table>
           <tr>
             <th>Route</th>
@@ -75,20 +76,21 @@
       <div id=the-controls>
        
         <button id="the-run-button">Go</button>
+        <button id="the-reset-button">Reset</button>
         
-        <div id="launch-rate-slider-div" class="hint--top hint--rounded" data-hint="number of cars on the road, from zero to the maximum road capacity">
+        <div id="launch-rate-slider-div" class="hint--top hint--rounded" data-hint="Controls the rate at which cars enter the road system.">
           <label for="launch-rate-slider" class="label">Vehicle Launch Rate</label>
           <input id="launch-rate-slider" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.55">
           <output id="launch-rate-output" for="launch-rate-slider" class="slider-output">0.55</output>
         </div>
                 
-        <div id="congestion-slider-div" class="hint--top hint--rounded" data-hint="effect of congestion on speed in links a and b">
+        <div id="congestion-slider-div" class="hint--top hint--rounded" data-hint="Determines the effect of traffic congestion on vehicle speed in links a and b.">
           <label for="congestion-slider" class="label">Congestion Coefficient</label>
           <input id="congestion-slider" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.55">
           <output id="congestion-output" for="congestion-slider" class="slider-output">0.55</output>
         </div>
         
-        <div id="launch-menu-div" class="geeky hidden-control">
+        <div id="launch-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Select the probability distribution for cars entering the road network.">
           <label for="launch-timing-menu" class="label">Launch Timing</label>
           <select id="launch-timing-menu">
             <option value="poisson">random poisson</option>
@@ -97,7 +99,7 @@
           </select>
         </div>
         
-        <div id="mode-menu-div">
+        <div id="mode-menu-div" class="hint--top hint--rounded" data-hint="A selfish router always tries to choose the quickest route; a random router flips coins.">
           <label for="routing-mode-menu" class="label">Routing Mode</label>
           <select id="routing-mode-menu">
             <option value="selfish">selfish</option>
@@ -105,7 +107,7 @@
           </select>
         </div>
         
-        <div id="speed-menu-div" class="geeky hidden-control">
+        <div id="speed-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Theoretical: compute speed from traffic density. Actual: measure current speed of all cars on the road. Historical: sum speed data for all cars that have completed the course.">
           <label for="speed-menu" class="label">Speed Measurement</label>
           <select id="speed-menu">
             <option value="theoretical">theoretical</option>
@@ -114,7 +116,7 @@
           </select>
         </div>
         
-        <div id="selection-method-menu-div" class="geeky hidden-control">
+        <div id="selection-method-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Always choose the fastest route or else choose routes with probability proportional to their speed.">
           <label for="selection-method-menu" class="label">Route Selection Method</label>
           <select id="selection-method-menu">
             <option value="minimum">always choose fastest</option>
@@ -122,9 +124,10 @@
           </select>
         </div>
         
-        <button id="the-reset-button">Reset</button>
-        <label id="max-cars-label" for="max-cars-input" class="label geeky hidden-control">Max Cars</label>
-        <input id="max-cars-input"  class="geeky hidden-control" type="number" min="0" max="10000" step="100">
+        <div id="max-cars-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Enter a number N > 0 to run N cars; if blank or zero, runs until Stop button pressed.">
+          <label id="max-cars-label" class="label" for="max-cars-input">Max Cars</label>
+          <input id="max-cars-input" type="number" min="0" max="10000" step="100">
+        </div>
         <div id="geek-out">More controls</div>
         <div id="hint-toggle">Hide hover hints</div>
       </div>
