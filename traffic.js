@@ -628,6 +628,7 @@
     nsLink.updateSpeed();
     snLink.updateSpeed();
     Dashboard.colorize();
+    setupForTouch();
   }
   
     // Make sure the on-screen input elements correctly reflect the values
@@ -883,6 +884,23 @@
     }
     hintMode = !hintMode;
   }
+  
+    // Set up for Touch devices. Kill the hints and the geek mode. Uses class
+    // added to the html tag by modernizr.
+  function setupForTouch() {    
+    if (Modernizr.touch) {
+      if (geekMode) {
+        toggleGeekMode();
+      }
+      if (hintMode) {
+        toggleHints();
+      }
+      geekToggle.style.display = "none";
+      hintToggle.style.display = "none";
+    }
+  }
+  
+  
   
   
     // Prints the contents of the Dashboard panel to the console at the end of the
