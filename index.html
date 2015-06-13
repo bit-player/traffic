@@ -91,7 +91,7 @@
           <output id="congestion-output" for="congestion-slider" class="slider-output">0.55</output>
         </div>
         
-        <div id="launch-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Select the probability distribution for cars entering the road network.">
+        <div id="launch-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Select the probability distribution for cars entering the road network." style="display: none">
           <label for="launch-timing-menu" class="label">Launch Timing</label>
           <select id="launch-timing-menu">
             <option value="poisson">random poisson</option>
@@ -108,7 +108,7 @@
           </select>
         </div>
         
-        <div id="speed-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Theoretical: compute speed from traffic density. Actual: measure current speed of all cars on the road. Historical: sum speed data for all cars that have completed the course.">
+        <div id="speed-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Theoretical: compute speed from traffic density. Actual: measure current speed of all cars on the road. Historical: sum speed data for all cars that have completed the course." style="display: none">
           <label for="speed-menu" class="label">Speed Measurement</label>
           <select id="speed-menu">
             <option value="theoretical">theoretical</option>
@@ -117,7 +117,7 @@
           </select>
         </div>
         
-        <div id="selection-method-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Always choose the fastest route or else choose routes with probability proportional to their speed.">
+        <div id="selection-method-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Always choose the fastest route or else choose routes with probability proportional to their speed." style="display: none">
           <label for="selection-method-menu" class="label">Route Selection Method</label>
           <select id="selection-method-menu">
             <option value="minimum">always choose fastest</option>
@@ -125,7 +125,7 @@
           </select>
         </div>
         
-        <div id="max-cars-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Enter a number N > 0 to run N cars; if blank or zero, runs until Stop button pressed.">
+        <div id="max-cars-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Enter a number N > 0 to run N cars; if blank or zero, runs until Stop button pressed." style="display: none">
           <label id="max-cars-label" class="label" for="max-cars-input">Max Cars</label>
           <input id="max-cars-input" type="number" min="0" max="10000" step="100">
         </div>

@@ -69,8 +69,8 @@
     padding: 8px 10px;
     font-size: 12px;
     line-height: 12px;
-    width: 150px;
-/*    white-space: nowrap; */
+    width: 150px;              /* added by BPH */
+/*    white-space: nowrap;        deleted by BPH  */
   }
 
 /**
