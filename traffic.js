@@ -914,6 +914,24 @@
     }
     console.log("total", Dashboard.countReadouts["total"].textContent, Dashboard.timeReadouts["total"].textContent);
   }
+  
+    // Just for producing graphs of occupancy levels; in default configuration,
+    // the only call to this function is commented out. When activated, carCensus 
+    // logs the number of cars on each route at each time step. The output is a sequence
+    // of five numbers: time, Ab, aB, AB, ab.
+  function carCensus(sampleInterval) {
+    var routeCounts = {"Ab": 0, "aB": 0, "AB": 0, "ab": 0};
+    var census = [globalClock, 0, 0, 0, 0]
+    if (Dashboard.departureCount > 10000 && globalClock % sampleInterval === 0) {
+      for (var i=0; i<carQueueSize; i++) {
+        var c = carArray[i];
+        if (c.route) {
+          routeCounts[c.route.label] += 1;
+        }
+      }
+      console.log(globalClock / speedLimit, routeCounts["Ab"], routeCounts["aB"], routeCounts["AB"], routeCounts["ab"])
+    }
+  }
     
     // Here we're at the starting line -- the procedure that prepares a car to
     // run the course and hands it off to the Origin node. But it's more complicated
@@ -995,6 +1013,7 @@
     launchCar();
     orig.dispatch();
     launchCar();
+//    carCensus(9);      // uncomment to log route occupancy numbers on every time step
     globalClock += speedLimit;
     if (modelState === "stopping" && parkingLot.len === carQueueSize) {  // all cars back in the barn, shut down
       window.clearInterval(animationTimer);
