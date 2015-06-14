@@ -71,6 +71,11 @@
     line-height: 12px;
     width: 150px;              /* added by BPH */
 /*    white-space: nowrap;        deleted by BPH  */
+/*    The nowrap property above forces hint text to */
+/*    occupy a single line, which becomes too wide */
+/*    with long messages. But without nowrap, the hint */
+/*    text is dribbled into a very tall and skinny box; */
+/*    the 150px width corrects that. */
   }
 
 /**
