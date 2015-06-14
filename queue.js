@@ -2,6 +2,11 @@
 /*
 Implementation of queue as a circular buffer. Note: no checking
 for overflow and underflow. Should never happen here.
+
+I chose the circular buffer rather than Javascript's built-in
+'unshift' and 'pop' methods for efficiency reasons: This way I
+get constant-time enqueue and dequeue, whereas 'unshift' is linear
+in the length of the queue.
 */
 
 // constructor
@@ -41,13 +46,3 @@ for overflow and underflow. Should never happen here.
   }
   
   
-  
-function qtest(n) {
-  var q = new Queue(n);
-  for (var i = 1; i <= n; i++) {
-    q.enqueue(i);
-  }
-  for (var j = 1; j <= n; j++) {
-    console.log(q.dequeue());
-  }
-}
