@@ -762,6 +762,23 @@
     }
   }
   
+    // This is a version of goStopButton that brings the model to an immediate halt,
+    // leaving the cars in place on the road. It's useful if you want to take a screen
+    // shot of the model in action.
+//  function goStopButton(e) {
+//    if (modelState === "stopped") {
+//      modelState = "running";
+//      goButton.innerHTML = "Stop";
+//      animate();
+//    }
+//    else if (modelState === "running") {
+//      window.clearInterval(animationTimer);
+//      modelState = "stopped";
+//      goButton.innerHTML = "Go";
+//      goButton.removeAttribute("disabled");
+//    }
+//  }
+  
     // Handler for the Reset button. If the model is running, we need to
     // stop the animation. Then we clear all cars from links and nodes,
     // clear the dashboard, and reset a few globals.
