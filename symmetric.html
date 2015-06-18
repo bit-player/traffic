@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Traffic</title>
+    <meta name="author" content="Brian Hayes">
+
+    <link rel="stylesheet" href="traffic.css">
+    <link id="hint-stylesheet" rel="stylesheet" href="hint.css">
+    <script src="modernizr.custom.24720.js"></script>
+
+  </head>
+  
+  <body>
+   
+    <div id="content">
+      
+      <div id="stats">
+        <h3>Symmetric traffic</h3>
+        <div id="explanation">Roads <em>A</em> and <em>B</em> take a roundabout route but can carry unlimited traffic. Roads <em>a</em> and <em>b</em> are shorter but subject to congestion: The more cars, the slower they go. Initially, just two routes lead from Origin to Destination: <em>Ab</em> and <em>aB</em>. Clicking on the bridge in the middle of the map opens up two more pathways: <em>AB</em> and <em>ab</em>. Will these added routes improve the flow of traffic? For more information see <a href="http://bit-player.org/traffic-jams-in-javascript">bit-player.org</a>; source code on <a href="https://github.com/bit-player/traffic">Github</a>.</div>
+        <table id=stats-table>
+          <tr>
+            <th>Route</th>
+            <th class="count-cell">Count</th>
+            <th class="time-cell">Time</th>
+          </tr>
+          <tr id="aA-row">
+            <td>aA</td><td id="aA-count" class="count-cell">0</td><td id="aA-time" class="time-cell">--</td>
+          </tr>
+          <tr id="aB-row">
+            <td>aB</td><td id="aB-count" class="count-cell">0</td><td id="aB-time" class="time-cell">--</td>
+          </tr>
+          <tr id="bA-row">
+            <td>bA</td><td id="bA-count" class="count-cell">0</td><td id="bA-time" class="time-cell">--</td>
+          </tr>
+          <tr id="bB-row">
+            <td>bB</td><td id="bB-count" class="count-cell">0</td><td id="bB-time" class="time-cell">--</td>
+          </tr>
+          <tr id="total-row">
+            <td>Total</td><td id="total-count" class="count-cell">0</td><td id="total-time" class="time-cell">--</td>
+          </tr>
+
+        </table>
+      </div>
+
+      <div id="the-viz">
+        <svg id="the-svg" 
+         xmlns="http://www.w3.org/2000/svg" 
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         width="640px" height="400px" viewBox="0 0 640 400">
+          <g id="the-coordinate-frame" transform="translate(0, 400) scale(1, -1)">
+            <rect id="the-frame" x="0" y="0" width="640" height="400" fill="#b5b2a3" stroke="#717171"></rect>
+            <path id="b" class="thin-road" d="M 50 200 L 320 180"/>
+            <path id="a" class="thin-road" d="M 50 200 L 320 220"/>
+            <path id="A" class="wide-road" d="M 320 220 C 345 445 575 444 590 200" />
+            <path id="B" class="wide-road" d="M 320 180 C 345 -44 575 -45 590 200" />
+            <path id="sn-bridge" class="wide-road closed" d="M 320 180 L 320 220" />
+            <path id="ns-bridge" class="wide-road closed" d="M 320 220 L 320 180" />
+            <path id="barricade" d="M 315 195 L 325 205 M 315 205 L 325 195" />
+            <circle id="orig" class="junction" cx="50" cy="200" r="10" />
+            <circle id="dest" class="junction" cx="590" cy="200" r="10" />
+            <circle id="south" class="junction" cx="320" cy="180" r="6" />
+            <circle id="north" class="junction" cx="320" cy="220" r="6" />
+         </g>
+          <text x="50" y="227" text-anchor="middle">Origin</text>
+          <text x="535" y="205" text-anchor="middle">Destination</text>
+          <text x="455" y="40" text-anchor="middle">A</text>
+          <text x="185" y="235" text-anchor="middle">b</text>
+          <text x="185" y="175" text-anchor="middle">a</text>
+          <text x="455" y="373" text-anchor="middle">B</text>
+         </svg>        
+      </div>  <!-- end of the-viz div-->
+
+      <div id=the-controls>
+       
+        <button id="the-run-button">Go</button>
+        <button id="the-reset-button">Reset</button>
+        
+        <div id="launch-rate-slider-div" class="hint--top hint--rounded" data-hint="Controls the rate at which cars enter the road system.">
+          <label for="launch-rate-slider" class="label">Vehicle Launch Rate</label>
+          <input id="launch-rate-slider" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.55">
+          <output id="launch-rate-output" for="launch-rate-slider" class="slider-output">0.55</output>
+        </div>
+                
+        <div id="congestion-slider-div" class="hint--top hint--rounded" data-hint="Determines the effect of traffic congestion on vehicle speed in links a and b.">
+          <label for="congestion-slider" class="label">Congestion Coefficient</label>
+          <input id="congestion-slider" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.55">
+          <output id="congestion-output" for="congestion-slider" class="slider-output">0.55</output>
+        </div>
+        
+        <div id="launch-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Select the probability distribution for cars entering the road network." style="display: none">
+          <label for="launch-timing-menu" class="label">Launch Timing</label>
+          <select id="launch-timing-menu">
+            <option value="poisson">random poisson</option>
+            <option value="uniform">random uniform</option>
+            <option value="periodic">periodic</option>
+          </select>
+        </div>
+        
+        <div id="mode-menu-div" class="hint--top hint--rounded" data-hint="A selfish router always tries to choose the quickest route; a random router flips coins.">
+          <label for="routing-mode-menu" class="label">Routing Mode</label>
+          <select id="routing-mode-menu">
+            <option value="selfish">selfish</option>
+            <option value="random">random</option>
+          </select>
+        </div>
+        
+        <div id="speed-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Theoretical: compute speed from traffic density. Actual: measure current speed of all cars on the road. Historical: sum speed data for all cars that have completed the course." style="display: none">
+          <label for="speed-menu" class="label">Speed Measurement</label>
+          <select id="speed-menu">
+            <option value="theoretical">theoretical</option>
+            <option value="actual">actual</option>
+            <option value="historical">historical</option>
+          </select>
+        </div>
+        
+        <div id="selection-method-menu-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Always choose the fastest route or else choose routes with probability proportional to their speed." style="display: none">
+          <label for="selection-method-menu" class="label">Route Selection Method</label>
+          <select id="selection-method-menu">
+            <option value="minimum">always choose fastest</option>
+            <option value="weighted-probability">weighted probability</option>
+          </select>
+        </div>
+        
+        <div id="max-cars-div" class="geeky hidden-control hint--top hint--rounded" data-hint="Enter a number N > 0 to run N cars; if blank or zero, runs until Stop button pressed." style="display: none">
+          <label id="max-cars-label" class="label" for="max-cars-input">Max Cars</label>
+          <input id="max-cars-input" type="number" min="0" max="10000" step="100">
+        </div>
+        <div id="geek-out">More controls</div>
+        <div id="hint-toggle">Hide hover hints</div>
+      </div>
+
+      <div id="caption">
+      </div>
+
+    </div>
+    
+    <script src="es5-shim.min.js"></script>
+    <script src="queue.js"></script>
+    <script src="symmetric.js"></script>
+  </body>
+</html>
+
+
+
+
