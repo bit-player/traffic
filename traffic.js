@@ -2,9 +2,12 @@
   Road traffic simulator for exploring Braess's paradox.
   By Brian Hayes, 2015. MIT license.
   For more background see American Scientist July 2015.
+  For more background see American Scientist July 2015
+  and http://bit-player.org/2015/traffic-jams-in-javascript.
 */
 
-(function() {
+
+(function () {
   
   var xmlns = "http://www.w3.org/2000/svg";
   var frame = document.getElementById("the-coordinate-frame");
@@ -65,8 +68,8 @@
   var modelState = "stopped"; // other states are "running" and "stopping"
   var bridgeBlocked = true;
   var routingMode = "selfish";   // other mode is "random" 
-  var speedMode = "theoretical"  // alternatives are "actual," "historical"
-  var selectionMethod = "minimum"  // other choice is "weighted-probability"
+  var speedMode = "theoretical";  // alternatives are "actual," "historical"
+  var selectionMethod = "minimum";  // other choice is "weighted-probability"
   var launchTiming = "poisson";   // others are "uniform," "periodic"
   var launchTimer = poisson;      // pointer to function
   var globalClock = 0;       // integer count of simulation steps, for measuring travel time
@@ -138,15 +141,15 @@
     this.x = this.svgCircle.cx.baseVal.value;         // get coords from the HTML
     this.y = this.svgCircle.cy.baseVal.value;         // "baseVal.value" because animatable
     this.car = null;
-  }
+  };
     
   Node.prototype.hasRoom = function() {       // must call before trying to pass along a car
     return !this.car;
-  }
+  };
   
   Node.prototype.accept = function(car) {     // no worries about atomicity; js is single-threaded
     this.car = car;
-  }
+  };
   
     // clean up if somebody presses the reset button
   Node.prototype.evacuate = function() {
@@ -154,7 +157,7 @@
       this.car.park();      // back to the parking lot
       this.car = null;
     }
-  }
+  };
 
   
     // The dispatch function is the main duty of a node -- deciding where
@@ -176,7 +179,7 @@
         this.car = null;                            // empty buffer, ready for next
       }
     }
-  }
+  };
   
     // the four nodes of the Braess road network
   var orig = new Node("orig");
@@ -193,7 +196,7 @@
       this.car.park();
       this.car = null;
     }
-  }
+  };
   
 
   // Now we move on to the links, the roadways of the model. Again there's a
@@ -219,16 +222,16 @@
     this.occupancy = this.carQ.len;
     this.speed = speedLimit;
     this.travelTime = this.pathLength / speedLimit;   // default value, will be overridden
-  }
+  };
   
   Link.prototype.updateSpeed = function() {      // default, works for wide roads; will override for a and b
     this.speed = speedLimit;
     this.travelTime = this.pathLength / this.speed;
-  }
+  };
     
   Link.prototype.getCarXY = function(progress) {     // 0 <= progress <= path.length
     return this.svgPath.getPointAtLength(progress);
-  }
+  };
   
     // This is where the rubber meets the road, the procedure that actually
     // moves the cars along a link. It's also where most of the CPU cycles
@@ -267,7 +270,7 @@
         this.updateSpeed();      // occupancy has decreased by 1
       }
     }
-  }
+  };
 
   
     // when Reset pressed, dump all the cars back to the parking lot
@@ -277,7 +280,7 @@
       c.park();
     }
     this.updateSpeed();
-  }
+  };
 
     // here we create the six links of the road network
   var aLink = new Link("a", orig, south);
@@ -304,7 +307,7 @@
       this.speed = epsilon;
     }
     this.travelTime = this.pathLength / this.speed;
-  }
+  };
 
     // borrow the aLink method for bLink
   bLink.updateSpeed = aLink.updateSpeed;
@@ -321,7 +324,7 @@
     var y = this.originXY.y;
     var x = this.originXY.x + progress;
     return {"x": x, "y": y};             // return a point object in same format as getPointAtLength
-  }
+  };
   
   bLink.getCarXY = aLink.getCarXY;      // again bLink borrows the method
   
@@ -329,13 +332,13 @@
     var x = this.originXY.x;
     var y = this.originXY.y + progress;
     return {"x": x, "y": y}; 
-  }
+  };
   
   nsLink.getCarXY = function(progress) {   // borrowing won't work in this case because of sign difference
     var x = this.originXY.x;
     var y = this.originXY.y - progress;
     return {"x": x, "y": y};
-  }
+  };
   
     // this one is not a link, just a bare queue, but
     // it has a closely analogous function. This is the holding
@@ -360,16 +363,16 @@
     this.itinerary = [];
     this.routeLength = 0;
     this.travelTime = 0;
-  }
+  };
   
     // total length is just sum of constituent link lengths
   Route.prototype.calcRouteLength = function() {
     var rtl = 0;
     this.itinerary.forEach(function(link) {
       rtl += link.pathLength;
-    })
+    });
     this.routeLength = rtl;
-  }
+  };
   
     // For calculating the expected travel time over a route, we have a 
     // choice of three procedures. (The choice is determined by the
@@ -385,7 +388,7 @@
     else {
       this.calcTravelTimeHistorical();
     }
-  }
+  };
   
   
     // The theoretical travel time comes straight out of the definition
@@ -402,9 +405,9 @@
     // travel time.
   Route.prototype.calcTravelTimeTheoretical = function() {
     var tt = 0;
-    this.itinerary.forEach(function(link) {tt += link.travelTime;})
+    this.itinerary.forEach(function(link) {tt += link.travelTime;});
     this.travelTime = tt;
-  }
+  };
   
   
     // An alternative to the theoretical approach is to actually measure
@@ -421,7 +424,7 @@
         v = (c.odometer / (globalClock - c.departTime)) * speedLimit;   // speed
         tt = this.routeLength / v;    // travel time
         sum += tt;    // sum of travel times for all cars on the route
-        n++
+        n++;
       }
     }
     if (n === 0) {
@@ -430,7 +433,7 @@
     else {
       this.travelTime = sum / n;    // average travel time for all cars on the route
     }
-  }
+  };
   
   
     // A third approach: Use the cumulative statistics on travel times experienced
@@ -442,7 +445,7 @@
     else {
       this.travelTime = Dashboard.times[this.label] / Dashboard.counts[this.label];    // average travel time
     }
-  }
+  };
   
   
     // Define the four possible routes as instances of Route().
@@ -492,7 +495,7 @@
     // one of the available routes uniformly at random.
   chooser.random = function(routeList) {
     return routeList[Math.floor(Math.random() * routeList.length)];
-  }
+  };
   
     // The min chooser always takes the route with the shortest expected
     // travel time, no matter how small the advantage might be. If multiple
@@ -515,7 +518,7 @@
     else {
       return minRoutes[Math.floor(Math.random() * minRoutes.length)];    // random choice among all best
     }
-  }
+  };
     
     // Rather than the winner-take-all strategy of the min chooser, here we
     // make a random choice with probabilities weighted according to the 
@@ -527,16 +530,16 @@
       routeList[i].travelTime = 1 / routeList[i].travelTime;    // inverse of travel time
       valSum += routeList[i].travelTime;                        // sum of the reciprocals
     }
-    routeList.forEach(function(rt) {rt.travelTime /= valSum});  // normalize so probabilities sum to 1
+    routeList.forEach(function(rt) {rt.travelTime /= valSum;});  // normalize so probabilities sum to 1
     var r = Math.random();
     var accum = 0;
-    for (var i = 0; i < routeList.length; i++) {     // step through routes until cumulative
+    for (i = 0; i < routeList.length; i++) {     // step through routes until cumulative
       accum += routeList[i].travelTime;              // weighted probability > random r
       if (accum > r) {
           return routeList[i];
       }
     }
-  }
+  };
 
       
     // The ugly nest of if-else clauses, based on two state variables,
@@ -589,7 +592,7 @@
     this.avatar.setAttribute("display", "none");   // hidden until launched
     frame.appendChild(this.avatar);                // add avatar to the DOM
     parkingLot.enqueue(this);                      // add object to the holding pen
-  }
+  };
   
     // Reset a car to default "parked" state, and add it to the
     // parking lot queue. Used when a car reaches the destination node
@@ -604,7 +607,7 @@
     this.pastProgress = 0;
     this.odometer = 0;
     parkingLot.enqueue(this);
-  }
+  };
 
     // Here's where we make all the cars. Note that new Car() enqueues them in
     // parkingLot.
@@ -646,7 +649,7 @@
     for (var i=0; i<geekyControls.length; i++) {
       geekyControls[i].style.display = "none";
     }
-    geekToggle.textContent = "More controls"
+    geekToggle.textContent = "More controls";
     geekMode = false;
   }
   
@@ -696,7 +699,7 @@
     },
 
     recordDeparture: function() {            // called by launchCar
-      this.departureCount++
+      this.departureCount++;
     },
     
     recordArrival: function(car) {          // called by dest.dispatch
@@ -739,7 +742,7 @@
       }
       this.updateReadouts();
     }
-  }
+  };
   
 
   // Event handlers and other routines connected with controls and the user interface.
@@ -838,7 +841,7 @@
   
     // Handler for Launch Timing select input.
   function getLaunchTiming(e) {
-    var timings = {"poisson": poisson, "uniform": uniform, "periodic": periodic}
+    var timings = {"poisson": poisson, "uniform": uniform, "periodic": periodic};
     var selectedTiming = launchTimingMenu.value;
     launchTiming = selectedTiming;
     launchTimer = timings[selectedTiming];
@@ -873,13 +876,13 @@
       for (var i=0; i<geekyControls.length; i++) {
         geekyControls[i].style.display = "none";
       }
-      geekToggle.textContent = "More controls"
+      geekToggle.textContent = "More controls";
     }
     else {
-      for (var i=0; i<geekyControls.length; i++) {
+      for (i=0; i<geekyControls.length; i++) {
         geekyControls[i].style.display="block";
       }
-      geekToggle.textContent = "Fewer controls"
+      geekToggle.textContent = "Fewer controls";
    }
     geekMode = !geekMode;
   }
@@ -893,11 +896,11 @@
   function toggleHints(e) {
     if (hintMode) {
       hintStylesheet.disabled = true;
-      hintToggle.textContent = "Show hover hints"
+      hintToggle.textContent = "Show hover hints";
     }
     else {
       hintStylesheet.disabled = false;
-      hintToggle.textContent = "Hide hover hints"
+      hintToggle.textContent = "Hide hover hints";
     }
     hintMode = !hintMode;
   }
@@ -938,7 +941,7 @@
     // of five numbers: time, Ab, aB, AB, ab.
   function carCensus(sampleInterval) {
     var routeCounts = {"Ab": 0, "aB": 0, "AB": 0, "ab": 0};
-    var census = [globalClock, 0, 0, 0, 0]
+    var census = [globalClock, 0, 0, 0, 0];
     if (Dashboard.departureCount > 10000 && globalClock % sampleInterval === 0) {
       for (var i=0; i<carQueueSize; i++) {
         var c = carArray[i];
@@ -946,7 +949,7 @@
           routeCounts[c.route.label] += 1;
         }
       }
-      console.log(globalClock / speedLimit, routeCounts["Ab"], routeCounts["aB"], routeCounts["AB"], routeCounts["ab"])
+      console.log(globalClock / speedLimit, routeCounts["Ab"], routeCounts["aB"], routeCounts["AB"], routeCounts["ab"]);
     }
   }
     
