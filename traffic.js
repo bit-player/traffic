@@ -1,73 +1,72 @@
-/*   
+/*
   Road traffic simulator for exploring Braess's paradox.
   By Brian Hayes, 2015. MIT license.
-  For more background see American Scientist July 2015.
   For more background see American Scientist July 2015
   and http://bit-player.org/2015/traffic-jams-in-javascript.
 */
 
 
 (function () {
-  
+
   var xmlns = "http://www.w3.org/2000/svg";
   var frame = document.getElementById("the-coordinate-frame");
-  
-  
+
+
     // event handlers and pointers to DOM elements
   var snBridge = document.getElementById("sn-bridge");
   snBridge.addEventListener("click", toggleBridge, false);
-  
+
   var nsBridge = document.getElementById("ns-bridge");
   nsBridge.addEventListener("click", toggleBridge, false);
-  
+
   var theBarricade = document.getElementById("barricade");
   theBarricade.addEventListener("click", toggleBridge, false);
-  
+
   var goButton = document.getElementById("the-run-button");
   goButton.addEventListener("click", goStopButton, false);
-  
+
   var resetButton = document.getElementById("the-reset-button");
   resetButton.addEventListener("click", resetModel, false);
-  
+
   var maxCarsInput = document.getElementById("max-cars-input");
   maxCarsInput.addEventListener("input", setMaxCars, false);
-  
+
   var launchRateSlider = document.getElementById("launch-rate-slider");
   launchRateSlider.addEventListener("input", getLaunchRate, false);
-  
+
   var launchRateOutput = document.getElementById("launch-rate-output");
-  
+
   var congestionSlider = document.getElementById("congestion-slider");
   congestionSlider.addEventListener("input", getCongestionCoef, false);
-  
+
   var congestionOutput = document.getElementById("congestion-output");
-  
+
   var launchTimingMenu = document.getElementById("launch-timing-menu");
   launchTimingMenu.addEventListener("change", getLaunchTiming, false);
-  
+
   var routingModeMenu = document.getElementById("routing-mode-menu");
   routingModeMenu.addEventListener("change", getRoutingMode, false);
-  
+
   var speedMenu = document.getElementById("speed-menu");
   speedMenu.addEventListener("change", getSpeedMode, false);
-  
+
   var selectionMethodMenu = document.getElementById("selection-method-menu");
   selectionMethodMenu.addEventListener("change", getSelectionMethod, false);
-  
+
   var geekToggle = document.getElementById("geek-out");
   geekToggle.addEventListener("click", toggleGeekMode, false);
-  
+
   var hintToggle = document.getElementById("hint-toggle");
   hintToggle.addEventListener("click", toggleHints, false);
-  
+
   var hintStylesheet = document.getElementById("hint-stylesheet");
-  
-  
-  
+
+
+
     // globals
   var modelState = "stopped"; // other states are "running" and "stopping"
   var bridgeBlocked = true;
-  var routingMode = "selfish";   // other mode is "random" 
+  var routingMode = "selfish";   // other mode is "random"
   var speedMode = "theoretical";  // alternatives are "actual," "historical"
   var selectionMethod = "minimum";  // other choice is "weighted-probability"
   var launchTiming = "poisson";   // others are "uniform," "periodic"
@@ -76,7 +75,7 @@
   var nextDeparture = 0;      // next clock reading at which a car is due to depart
   var maxCars = Infinity;      // specified by the macCarsInput element; if blank, no limit
   var animationTimer;        // for setInterval/clearInterval
-  var carRadius = 3;         
+  var carRadius = 3;
   var carLength = 2 * carRadius;
   var totalPathLength = 1620;
   var carQueueSize = (totalPathLength / carLength) + 10;   // make sure we never run out of cars
@@ -88,16 +87,16 @@
   var geekMode = false;     // whether to show extra geeky controls; initially no
   var hintMode = true;      // whether to show tooltips; intially yes
 
-  
-  
-  
-  
+
+
+
+
   // probability distributions and related stuff
-  
+
   function coinFlip() {
     return Math.random() < 0.5;      // note: returns boolean
   }
-  
+
     // Return a random interval drawn from exponential distribution
     // with rate parameter lambda
     // Why 1 - Math.random() rather than just plain Math.random()?
@@ -109,13 +108,13 @@
   function poisson(lambda) {
     return -Math.log(1 - Math.random()) / lambda;
   }
-  
+
     // Return a real chosen uniformly at random from a finite interval [0, d),
     // where d = 2 / lambda. Thus the mean of the distribution is 1 / lambda.
   function uniform(lambda) {
     return Math.random() * 2 / lambda;
   }
-  
+
     // Generates a simple periodic sequence, without randomness, with period
     // 1 / lambda. But note that cars are launched only at integer instants,
     // so the observed stream of cars may not be as regular as this function
@@ -123,17 +122,17 @@
   function periodic(lambda) {
     return 1 / lambda;
   }
-  
-  
-  
+
+
+
     // The road network is built from two kinds of components: nodes, where
     // roads begin or end of intersect, and links, which are directed paths running
     // from one node to the next.
-  
+
     // Most of the logic in the model is implemented by the nodes, which
     // act as routers for the cars. Visually, a node is an SVG circle. Algorithmically,
     // it's a buffer with a capacity of one car.
-  
+
     // constructor for Nodes
   var Node = function(idStr) {
     this.nodeName = idStr;
@@ -142,15 +141,15 @@
     this.y = this.svgCircle.cy.baseVal.value;         // "baseVal.value" because animatable
     this.car = null;
   };
-    
+
   Node.prototype.hasRoom = function() {       // must call before trying to pass along a car
     return !this.car;
   };
-  
+
   Node.prototype.accept = function(car) {     // no worries about atomicity; js is single-threaded
     this.car = car;
   };
-  
+
     // clean up if somebody presses the reset button
   Node.prototype.evacuate = function() {
     if (this.car) {
@@ -159,7 +158,7 @@
     }
   };
 
-  
+
     // The dispatch function is the main duty of a node -- deciding where
     // each car goes next and moving it along. Actually, there's not much
     // deciding to be done. Each car carries its own itinerary, so the node
@@ -180,16 +179,16 @@
       }
     }
   };
-  
+
     // the four nodes of the Braess road network
   var orig = new Node("orig");
   var dest = new Node("dest");
   var south = new Node("south");
   var north = new Node("north");
-  
-  
+
+
     // The final destination node has some special duties, so we override
-    // the dispatch method. 
+    // the dispatch method.
   dest.dispatch = function() {
     if (this.car) {
       Dashboard.recordArrival(this.car);                  // Dashboard is where we record stats
@@ -197,7 +196,7 @@
       this.car = null;
     }
   };
-  
+
 
   // Now we move on to the links, the roadways of the model. Again there's a
   // visible manifestation as an SVG element and a behind-the-scenes data
@@ -206,7 +205,7 @@
   // Note that much of the basic data about the link comes from the SVG
   // (which is defined in index.html): the length of the path, start and end
   // coordinates, which class of road it is (congestible or not).
-  
+
     // constructor for links; oNode and dNode are the origin and destination nodes
   var Link = function(idStr, oNode, dNode) {
     this.id = idStr;
@@ -223,26 +222,26 @@
     this.speed = speedLimit;
     this.travelTime = this.pathLength / speedLimit;   // default value, will be overridden
   };
-  
+
   Link.prototype.updateSpeed = function() {      // default, works for wide roads; will override for a and b
     this.speed = speedLimit;
     this.travelTime = this.pathLength / this.speed;
   };
-    
+
   Link.prototype.getCarXY = function(progress) {     // 0 <= progress <= path.length
     return this.svgPath.getPointAtLength(progress);
   };
-  
+
     // This is where the rubber meets the road, the procedure that actually
     // moves the cars along a link. It's also where most of the CPU cycles
     // get spent.
     //    The basic idea is to take a car's current speed, determine how far it
     // will move along the path at that speed in one time step, and update
     // its xy coordinates. But there's a complication: The car may not be able
-    // to move that far if there's another car in front of it. 
+    // to move that far if there's another car in front of it.
     //    The first car in the queue needs special treatment. We know there's
     // no one in front of it, but it may be near the end of the path.
-  
+
   Link.prototype.drive = function() {
     var i, car, firstCar, leader, follower, carXY;
     if (this.carQ.len > 0) {
@@ -253,7 +252,7 @@
       carXY = this.getCarXY(firstCar.progress);
       firstCar.avatar.setAttribute("cx", carXY.x);      // setting SVG coords
       firstCar.avatar.setAttribute("cy", carXY.y);
-      
+
       for (i = 1; i < this.carQ.len; i++) {      // now for all the cars after the first one
         leader = this.carQ.peek(i - 1);
         follower = this.carQ.peek(i);
@@ -264,7 +263,7 @@
         follower.avatar.setAttribute("cx", carXY.x);
         follower.avatar.setAttribute("cy", carXY.y);
       }
-      
+
       if (firstCar.progress >= this.pathLength && this.destinationNode.hasRoom()) {    // hand off car to destination node
         this.destinationNode.accept(this.carQ.dequeue());
         this.updateSpeed();      // occupancy has decreased by 1
@@ -272,7 +271,7 @@
     }
   };
 
-  
+
     // when Reset pressed, dump all the cars back to the parking lot
   Link.prototype.evacuate = function() {
     while (this.carQ.len > 0) {
@@ -293,7 +292,7 @@
     // default state, bridge closed in both directions
   snLink.openToTraffic = false;
   nsLink.openToTraffic = false;
-    
+
     // We need to override the updateSpeed method for the narrow links a and b,
     // where traffic slows as a function of density. Under the formula given here,
     // if occupancy === 0 (i.e., no cars on the road), speed === speedLimit. At
@@ -312,11 +311,11 @@
     // borrow the aLink method for bLink
   bLink.updateSpeed = aLink.updateSpeed;
 
-  
+
     // The following four method overrides are for efficiency only. They
     // can be eliminated without changing functionality.
     //    The default getCarXY uses the SVG path method getPointAtLength.
-    // Profiling suggests that the program spends most of its cpu cycles 
+    // Profiling suggests that the program spends most of its cpu cycles
     // executing this function. Four of the links are axis-parallel straight
     // lines, for which we can easily calculate position without going into
     // the SVG path.
@@ -325,28 +324,28 @@
     var x = this.originXY.x + progress;
     return {"x": x, "y": y};             // return a point object in same format as getPointAtLength
   };
-  
+
   bLink.getCarXY = aLink.getCarXY;      // again bLink borrows the method
-  
+
   snLink.getCarXY = function(progress) {
     var x = this.originXY.x;
     var y = this.originXY.y + progress;
-    return {"x": x, "y": y}; 
+    return {"x": x, "y": y};
   };
-  
+
   nsLink.getCarXY = function(progress) {   // borrowing won't work in this case because of sign difference
     var x = this.originXY.x;
     var y = this.originXY.y - progress;
     return {"x": x, "y": y};
   };
-  
+
     // this one is not a link, just a bare queue, but
     // it has a closely analogous function. This is the holding
     // pen for cars after they reach the destination and before
     // they get recycled to the origin.
   var parkingLot = new Queue(carQueueSize);   // holds idle cars
-  
-  
+
+
   // A Route object encodes a sequence of links leading from Origin
   // to Destination. For the road network in this model, there are
   // just two possible routes when the bridge is closed, four when
@@ -354,7 +353,7 @@
   // cars following the route display the color. And the route
   // also includes a directions object that instructs each node
   // on how to handle a car following the route.
-  
+
     // constructor
   var Route = function() {
     this.label = "";
@@ -364,7 +363,7 @@
     this.routeLength = 0;
     this.travelTime = 0;
   };
-  
+
     // total length is just sum of constituent link lengths
   Route.prototype.calcRouteLength = function() {
     var rtl = 0;
@@ -373,11 +372,11 @@
     });
     this.routeLength = rtl;
   };
-  
-    // For calculating the expected travel time over a route, we have a 
+
+    // For calculating the expected travel time over a route, we have a
     // choice of three procedures. (The choice is determined by the
     // Speed Measurement selector.)
-  
+
   Route.prototype.calcTravelTime = function() {
     if (speedMode === "theoretical") {
       this.calcTravelTimeTheoretical();
@@ -389,8 +388,8 @@
       this.calcTravelTimeHistorical();
     }
   };
-  
-  
+
+
     // The theoretical travel time comes straight out of the definition
     // of the model. For links a and b travel time is a function of
     // occupancy -- the number of cars traversing the link. All other
@@ -408,8 +407,8 @@
     this.itinerary.forEach(function(link) {tt += link.travelTime;});
     this.travelTime = tt;
   };
-  
-  
+
+
     // An alternative to the theoretical approach is to actually measure
     // the speed of cars currently traversing the route, and take an
     // average.
@@ -434,10 +433,10 @@
       this.travelTime = sum / n;    // average travel time for all cars on the route
     }
   };
-  
-  
+
+
     // A third approach: Use the cumulative statistics on travel times experienced
-    // by all cars that have completed the route. 
+    // by all cars that have completed the route.
   Route.prototype.calcTravelTimeHistorical = function() {
     if (Dashboard.counts[this.label] === 0) {
       this.travelTime = this.routeLength / speedLimit;    // if no data, use the default value
@@ -446,57 +445,57 @@
       this.travelTime = Dashboard.times[this.label] / Dashboard.counts[this.label];    // average travel time
     }
   };
-  
-  
+
+
     // Define the four possible routes as instances of Route().
-  
+
   var Ab = new Route();
   Ab.label = "Ab";
   Ab.paintColor = "#cb0130";
   Ab.directions = {"orig": ALink, "south": null, "north": bLink, "dest": parkingLot};
   Ab.itinerary = [ALink, bLink];
   Ab.calcRouteLength();
-  
+
   var aB = new Route();
   aB.label = "aB";
   aB.paintColor = "#1010a5";
   aB.directions = {"orig": aLink, "south": BLink, "north": null, "dest": parkingLot};
   aB.itinerary = [aLink, BLink];
   aB.calcRouteLength();
-  
+
   var AB = new Route();
   AB.label = "AB";
   AB.paintColor = "#ffc526";
   AB.directions = {"orig": ALink, "south": BLink, "north": nsLink, "dest": parkingLot};
   AB.itinerary = [ALink, nsLink, BLink];
   AB.calcRouteLength();
-  
+
   var ab = new Route();
   ab.label = "ab";
   ab.paintColor = "#4b9b55";
   ab.directions = {"orig": aLink, "south": snLink, "north": bLink, "dest": parkingLot};
   ab.itinerary = [aLink, snLink, bLink];
   ab.calcRouteLength();
-    
-  
-  
+
+
+
     // When a car is about to be launched upon a trip through the road
-    // network, we have to choose which route it will follow. In general, 
+    // network, we have to choose which route it will follow. In general,
     // the choice is based on the expected travel time, as determined by
     // one of the three methods above. But there are many ways to put the
     // timing information to use.
     //    Each of the functions below takes one argument, a list of all
     // available routes. This will be a list of either two or four elements,
     // depending on whether the bridge is closed or open.
-  
+
   var chooser = {};    // holder object for the three methods below
-    
+
     // The random chooser just ignores the route timings and chooses
     // one of the available routes uniformly at random.
   chooser.random = function(routeList) {
     return routeList[Math.floor(Math.random() * routeList.length)];
   };
-  
+
     // The min chooser always takes the route with the shortest expected
     // travel time, no matter how small the advantage might be. If multiple
     // routes have exactly the same time, the choice is random
@@ -519,9 +518,9 @@
       return minRoutes[Math.floor(Math.random() * minRoutes.length)];    // random choice among all best
     }
   };
-    
+
     // Rather than the winner-take-all strategy of the min chooser, here we
-    // make a random choice with probabilities weighted according to the 
+    // make a random choice with probabilities weighted according to the
     // travel times. Thus a small difference between two routes yields only
     // a slightly greater likelihood.
   chooser.probabilistic = function(routeList) {
@@ -541,7 +540,7 @@
     }
   };
 
-      
+
     // The ugly nest of if-else clauses, based on two state variables,
     // routingMode and selectionMethod.
   function chooseRoute() {
@@ -567,13 +566,13 @@
       }
     }
   }
-  
+
   // The cars are Javascript objects, with a "abatar" property that holds info
   // about the visual representation in SVG. We put the avatars into the DOM
   // at init time and then leave them there, to avoid the cost of repeated DOM
   // insertions and removals. Cars that aren't currently on the road are still
   // in the DOM but are hidden with display: none.
-  
+
   // constructor for cars
   var Car = function() {
     this.serialNumber = null;  // invariant assigned at creation, mostly for debugging use
@@ -593,7 +592,7 @@
     frame.appendChild(this.avatar);                // add avatar to the DOM
     parkingLot.enqueue(this);                      // add object to the holding pen
   };
-  
+
     // Reset a car to default "parked" state, and add it to the
     // parking lot queue. Used when a car reaches the destination node
     // or when the model is reset via UI button.
@@ -618,7 +617,7 @@
       carArray[i] = c;
     }
   }
-  
+
     // runs on load
   function init() {
     makeCars(carQueueSize);
@@ -633,7 +632,7 @@
     Dashboard.colorize();
     setupForTouch();
   }
-  
+
     // Make sure the on-screen input elements correctly reflect the values
     // of corresponding js variables. (This is needed mainly for Firefox,
     // which does not reset inputs on page reload.)
@@ -652,14 +651,14 @@
     geekToggle.textContent = "More controls";
     geekMode = false;
   }
-  
-  
-  
+
+
+
     // Dashboard for recording and displaying stats. The "counts" and "times"
     // dictionaries keep track of how many cars have traversed each route and
     // how long they took to do it. Each of these values is linked to a cell
-    // in an HTML table.  
-  
+    // in an HTML table.
+
   var Dashboard = {
     departureCount: 0,
     arrivalCount: 0,
@@ -684,7 +683,7 @@
     ab: document.getElementById("ab-time"),
     total: document.getElementById("total-time")
     },
-    
+
     colorize: function() {
       var AbRow = document.getElementById("Ab-row");    // make cell backgrounds match car colors
       AbRow.style.backgroundColor = Ab.paintColor;
@@ -701,7 +700,7 @@
     recordDeparture: function() {            // called by launchCar
       this.departureCount++;
     },
-    
+
     recordArrival: function(car) {          // called by dest.dispatch
       var elapsed = (globalClock - car.departTime) / speedLimit;
       var routeCode = car.route.label;
@@ -711,12 +710,12 @@
       this.times["total"] += elapsed;
       this.updateReadouts();
     },
-    
-    
+
+
       // For the time readout, we divide total elapsed time by number of
       // cars to get time per car; we then also divide by the duration of the
       // quickest conceivable trip from Origin to Destination. Thus all times
-      // are reported in units of this fastest trip. 
+      // are reported in units of this fastest trip.
     updateReadouts: function() {
       for (var ct in this.countReadouts) {
         this.countReadouts[ct].textContent = this.counts[ct];
@@ -730,7 +729,7 @@
         }
       }
     },
-    
+
     reset: function() {          // Reset button blanks out the stats display.
       this.departureCount = 0;
       this.arrivalCount = 0;
@@ -743,10 +742,10 @@
       this.updateReadouts();
     }
   };
-  
+
 
   // Event handlers and other routines connected with controls and the user interface.
-    
+
     // The Go button starts the animation, but the Stop button doesn't stop it.
     // Instead we just set a state variable, change the button text to "Wait",
     // and let any cars still on the road find their way to the destination.
@@ -764,7 +763,7 @@
       goButton.disabled = true;
     }
   }
-  
+
     // This is a version of goStopButton that brings the model to an immediate halt,
     // leaving the cars in place on the road. It's useful if you want to take a screen
     // shot of the model in action.
@@ -781,7 +780,7 @@
 //      goButton.removeAttribute("disabled");
 //    }
 //  }
-  
+
     // Handler for the Reset button. If the model is running, we need to
     // stop the animation. Then we clear all cars from links and nodes,
     // clear the dashboard, and reset a few globals.
@@ -799,8 +798,8 @@
     nextDeparture = 0;
     Dashboard.reset();
   }
-  
-  
+
+
     // Handler for the numeric input that allows us to run a specified number
     // of cars through the system.
   function setMaxCars(e) {
@@ -824,21 +823,21 @@
     nsBridge.classList.toggle("closed");
     theBarricade.classList.toggle("hidden");
   }
-  
-    // Handler for the Vehicle Launch Rate input (which will be rendered as a 
+
+    // Handler for the Vehicle Launch Rate input (which will be rendered as a
     // slider by most modern browsers).
   function getLaunchRate(e) {
     launchRate = Math.max(launchRateSlider.value, 0.001);
     launchRateOutput.textContent = launchRate.toFixed(2);
     nextDeparture = globalClock + launchTimer(launchRate / speedLimit);
   }
-  
+
     // Handler for the Congestion Coefficient slider.
   function getCongestionCoef(e) {
     congestionCoef = parseFloat(congestionSlider.value);
     congestionOutput.textContent = congestionCoef.toFixed(2);
   }
-  
+
     // Handler for Launch Timing select input.
   function getLaunchTiming(e) {
     var timings = {"poisson": poisson, "uniform": uniform, "periodic": periodic};
@@ -846,25 +845,25 @@
     launchTiming = selectedTiming;
     launchTimer = timings[selectedTiming];
   }
-  
+
     // Handler for Routing Mode select input.
   function getRoutingMode(e) {
     var selectedMode = routingModeMenu.value;
     routingMode = selectedMode;
   }
-  
-    // Handler for Speed Measurement select input.  
+
+    // Handler for Speed Measurement select input.
   function getSpeedMode(e) {
     var selectedMode = speedMenu.value;
     speedMode = selectedMode;
   }
-  
-    // Handler for Route Selection Method select input.  
+
+    // Handler for Route Selection Method select input.
   function getSelectionMethod(e) {
     var selectedMode = selectionMethodMenu.value;
     selectionMethod = selectedMode;
   }
-  
+
     // With two sliders, four drop-down menus, a couple of buttons, and a numeric
     // input control, the UI looks a bit intimidating. To avoid scaring people away
     // on first acquaintance, we can hide all but the most basic controls, and
@@ -886,7 +885,7 @@
    }
     geekMode = !geekMode;
   }
-  
+
     // Tooltips, or "hover hints", explain what all the geeky controls are supposed
     // to control. But the hints themselves are annoying after you've seen them the
     // first few times, so we provide a ways to turn them off. This is the click
@@ -904,10 +903,10 @@
     }
     hintMode = !hintMode;
   }
-  
+
     // Set up for Touch devices. Kill the hints and the geek mode. Uses class
     // added to the html tag by modernizr.
-  function setupForTouch() {    
+  function setupForTouch() {
     if (Modernizr.touch) {
       if (geekMode) {
         toggleGeekMode();
@@ -919,10 +918,10 @@
       hintToggle.style.display = "none";
     }
   }
-  
-  
-  
-  
+
+
+
+
     // Prints the contents of the Dashboard panel to the console at the end of the
     // run. Disabled by default; to activate, uncomment the line toward the end of
     // the step function, below.
@@ -934,9 +933,9 @@
     }
     console.log("total", Dashboard.countReadouts["total"].textContent, Dashboard.timeReadouts["total"].textContent);
   }
-  
+
     // Just for producing graphs of occupancy levels; in default configuration,
-    // the only call to this function is commented out. When activated, carCensus 
+    // the only call to this function is commented out. When activated, carCensus
     // logs the number of cars on each route at each time step. The output is a sequence
     // of five numbers: time, Ab, aB, AB, ab.
   function carCensus(sampleInterval) {
@@ -952,7 +951,7 @@
       console.log(globalClock / speedLimit, routeCounts["Ab"], routeCounts["aB"], routeCounts["AB"], routeCounts["ab"]);
     }
   }
-    
+
     // Here we're at the starting line -- the procedure that prepares a car to
     // run the course and hands it off to the Origin node. But it's more complicated
     // than it should be. Not every call to launchCar actually launches a car.
@@ -962,7 +961,7 @@
     // see if globalClock >= nextDeparture. However, the car can actually be launched
     // at that moment only if there is room for it in the orig node buffer. This
     // has nontrivial consequences when cars are being launched at high frequency.
-    // 
+    //
   function launchCar() {
     if (orig.hasRoom() && globalClock >= nextDeparture && modelState === "running" && parkingLot.len > 0) {
       var nextCar = parkingLot.dequeue();
@@ -977,10 +976,10 @@
       nextDeparture = globalClock + launchTimer(launchRate / speedLimit);
     }
   }
-  
 
-  
-  
+
+
+
     // The step function is the main driver of the simulation. The idea is
     // to poll all the nodes and links, moving cars along their route. But
     // in what sequence should we examine the nodes and links. It makes sense
@@ -1048,14 +1047,14 @@
       goButton.setAttribute("disabled", true);
     }
   }
-    
-  
+
+
   function animate() {                                // called by Go button event handler
     animationTimer = window.setInterval(step, 15);    // 15 milliseconds = roughly 60 frames per second
   }
-  
-  
+
+
   init();
-  
+
 
 })();
